@@ -39,6 +39,34 @@
                 "footer": {
                     "text": "{% if firstFailed == false %}Succeeded{% else %}Failed on task `{{firstFailed.taskId}}`{% endif %} after {{duration}}"
                 }
+                {% set hasMessage = customMessage is defined and customMessage is not empty %}
+                {% set hasFields = customFields is defined and customFields is not empty %}
+                {% if hasMessage or hasFields %}
+                {# Discord allows 25 fields per embed and 6000 characters per message (titles, descriptions,
+                   field names and values, footers). Extra customFields are replaced by one "more fields" note,
+                   and all fields share a 4000-character budget, leaving room for the description and footer. #}
+                {% set slots = hasMessage ? 24 : 25 %}
+                {% set fieldCount = hasFields ? (customFields | length) : 0 %}
+                {% set shown = fieldCount > slots ? slots - 1 : fieldCount %}
+                {% set total = (hasMessage ? 1 : 0) + shown + (fieldCount > slots ? 1 : 0) %}
+                {% set nameMax = min(256, 4000 / total / 4) %}
+                {% set valueMax = min(1024, 4000 / total - nameMax) %}
+                , "fields": [
+                    {% if hasMessage %}{
+                        "name": "Message",
+                        "value": {{ customMessage | abbreviate(valueMax) | toJson }}
+                    }{% endif %}
+                    {% if hasFields %}{% for entry in customFields %}{% if loop.index < shown %}{% if hasMessage or loop.index > 0 %}, {% endif %}{
+                        "name": {{ entry.key | abbreviate(nameMax) | toJson }},
+                        "value": {{ (((entry.value is map or entry.value is iterable) ? (entry.value | toJson) : (entry.value | string | default("-"))) | abbreviate(valueMax)) | toJson }},
+                        "inline": true
+                    }{% endif %}{% endfor %}{% endif %}
+                    {% if fieldCount > slots %}, {
+                        "name": "More fields",
+                        "value": {{ ("…and " ~ (fieldCount - shown) ~ " more fields omitted") | toJson }}
+                    }{% endif %}
+                ]
+                {% endif %}
           }
         ]
 }

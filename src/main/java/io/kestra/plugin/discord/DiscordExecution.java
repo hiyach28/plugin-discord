@@ -68,6 +68,14 @@ public class DiscordExecution extends DiscordTemplate implements ExecutionInterf
     @Builder.Default
     @PluginProperty(group = "advanced")
     private final Property<String> executionId = Property.ofExpression("{{ execution.id }}");
+    @Schema(
+        title = "Custom fields",
+        description = """
+            Added as fields of the notification embed, after the `customMessage` field if it is set. \
+            Discord allows at most 25 fields per embed, so if there are more entries, the last field \
+            says how many were omitted. Discord also limits a message to 6000 characters in total, so \
+            all fields share a budget of 4000 characters and long names and values are shortened."""
+    )
     @PluginProperty(group = "destination")
     private Property<Map<String, Object>> customFields;
     @PluginProperty(group = "destination")

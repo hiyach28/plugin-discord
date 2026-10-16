@@ -13,6 +13,10 @@ tasks:
     username: someUser
     executionId: "{{trigger.executionId}}"
     content: "A message *with some bold text* and _some italicized text_."
+    customMessage: 'Disk is "almost" full'
+    customFields:
+      env: prod
+      retries: 3
     embedList:
       - title: "Kestra Discord notification"
         color:
