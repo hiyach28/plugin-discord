@@ -97,7 +97,6 @@ public class DiscordIncomingWebhookTest {
     @SuppressWarnings("deprecation")
     @Test
     void flowSettingDeprecatedOptionsStillValidatesAndRuns() throws Exception {
-        // Flows written before the deprecation still set these options: they must keep parsing, validating and running.
         var embeddedServer = applicationContext.getBean(EmbeddedServer.class);
         embeddedServer.start();
 
